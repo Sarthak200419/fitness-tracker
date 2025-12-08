@@ -6,103 +6,152 @@
 <div class="auth-container">
     <div class="auth-card">
         <h1>Login</h1>
-        
+
         <form method="POST" class="form">
             <div class="form-group">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" required class="form-control">
             </div>
-            
+
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" required class="form-control">
+                <div class="password-wrapper">
+                    <input type="password" id="password" name="password" required class="form-control">
+                    <button type="button" class="password-toggle" onclick="togglePassword(this, 'password')">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" style="width: 1.2rem; height: 1.2rem;">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </button>
+                </div>
             </div>
-            
+
             <div class="form-group checkbox">
                 <input type="checkbox" id="remember_me" name="remember_me">
                 <label for="remember_me">Remember me</label>
             </div>
-            
+
             <button type="submit" class="btn btn-primary btn-block">Login</button>
         </form>
-        
+
         <p class="auth-link">Don't have an account? <a href="{{ url_for('auth.register') }}">Register here</a></p>
     </div>
 </div>
 
 <style>
-.auth-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 60vh;
-}
+    .auth-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 60vh;
+    }
 
-.auth-card {
-    background: white;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    width: 100%;
-    max-width: 400px;
-}
+    .auth-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 400px;
+    }
 
-.auth-card h1 {
-    margin-bottom: 1.5rem;
-    text-align: center;
-    color: #333;
-}
+    .auth-card h1 {
+        margin-bottom: 1.5rem;
+        text-align: center;
+        color: #333;
+    }
 
-.form-group {
-    margin-bottom: 1rem;
-}
+    .form-group {
+        margin-bottom: 1rem;
+    }
 
-.form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-    color: #555;
-}
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #555;
+    }
 
-.form-control {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1rem;
-}
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1rem;
+    }
 
-.form-control:focus {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 0 3px rgba(0,123,255,0.25);
-}
+    .form-control:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+    }
 
-.form-group.checkbox {
-    display: flex;
-    align-items: center;
-}
+    .form-group.checkbox {
+        display: flex;
+        align-items: center;
+    }
 
-.form-group.checkbox input {
-    margin-right: 0.5rem;
-}
+    .form-group.checkbox input {
+        margin-right: 0.5rem;
+    }
 
-.btn-block {
-    width: 100%;
-}
+    .btn-block {
+        width: 100%;
+    }
 
-.auth-link {
-    text-align: center;
-    margin-top: 1.5rem;
-}
+    .auth-link {
+        text-align: center;
+        margin-top: 1.5rem;
+    }
 
-.auth-link a {
-    color: #007bff;
-    text-decoration: none;
-}
+    .auth-link a {
+        color: #007bff;
+        text-decoration: none;
+    }
 
-.auth-link a:hover {
-    text-decoration: underline;
-}
+    .auth-link a:hover {
+        text-decoration: underline;
+    }
+
+    .password-wrapper {
+        position: relative;
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 1.2rem;
+        padding: 0;
+        color: #666;
+    }
 </style>
+
+<script>
+    function togglePassword(btn, inputId) {
+        const input = document.getElementById(inputId);
+        const type = input.type === 'password' ? 'text' : 'password';
+        input.type = type;
+
+        // Icons
+        const eyeIcon = `
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 1.2rem; height: 1.2rem;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>`;
+
+        const eyeSlashIcon = `
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 1.2rem; height: 1.2rem;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+            </svg>`;
+
+        btn.innerHTML = type === 'password' ? eyeIcon : eyeSlashIcon;
+    }
+</script>
 {% endblock %}

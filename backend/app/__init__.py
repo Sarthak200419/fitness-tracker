@@ -42,13 +42,14 @@ def create_app(config_name='development'):
     with app.app_context():
         db.create_all()
     
-    # Root route: redirect to dashboard if logged in, otherwise to login
+    # Root route: redirect to dashboard if logged in, otherwise show landing page
     @app.route('/')
     def home_redirect():
+        from flask import render_template
         from flask_login import current_user
         if current_user.is_authenticated:
             return redirect(url_for('dashboard.index'))
-        return redirect(url_for('auth.login'))
+        return render_template('landing.html')
 
     # Serve favicon.ico requests by redirecting to the SVG in static
     @app.route('/favicon.ico')
