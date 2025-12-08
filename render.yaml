@@ -1,0 +1,14 @@
+# Render.com deployment configuration
+web:
+  docker: true
+  region: oregon  # Change to your preferred region
+  plan: free  # Or pro/standard
+
+env:
+  - key: FLASK_ENV
+    value: production
+  - key: SECRET_KEY
+    generateValue: true
+  - key: SQLALCHEMY_DATABASE_URI
+    scope: build
+    value: postgresql://user:password@localhost/fitness_tracker

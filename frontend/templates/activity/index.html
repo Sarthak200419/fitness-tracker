@@ -1,0 +1,492 @@
+{% extends "base.html" %}
+
+{% block title %}Activity Tracker - Fitness Tracker{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="section-header">
+        <h1>My Workouts</h1>
+        <div class="header-actions">
+            <button id="btn-connect-ble" class="btn btn-secondary">
+                <span>🔌</span> Connect Device
+            </button>
+            <a href="{{ url_for('activity.log_activity') }}" class="btn btn-primary">
+                <span>+</span> Log New Workout
+            </a>
+        </div>
+    </div>
+
+    <!-- Bluetooth Status Widget (Hidden by default) -->
+    <div id="ble-widget" class="card ble-card hidden">
+        <div class="ble-header">
+            <div class="ble-status">
+                <div class="status-dot"></div>
+                <span id="ble-device-name">Scanning...</span>
+            </div>
+            <button id="btn-disconnect-ble" class="icon-btn">&times;</button>
+        </div>
+        <div class="ble-content">
+            <div class="heart-rate-display">
+                <span class="hr-value" id="hr-value">--</span>
+                <span class="hr-unit">BPM</span>
+                <div class="hr-icon">❤️</div>
+            </div>
+            <p class="ble-tip">Live Heart Rate</p>
+        </div>
+    </div>
+
+    {% if workouts.items %}
+    <div class="card-grid">
+        {% for workout in workouts.items %}
+        <div class="card activity-card">
+            <div class="card-header">
+                <h3>{{ workout.activity_name|title }}</h3>
+                <span class="badge badge-{{ workout.intensity }}">{{ workout.intensity|title }}</span>
+            </div>
+
+            <div class="card-body">
+                <div class="stat-row">
+                    <div class="stat-item">
+                        <span class="stat-icon">⏱️</span>
+                        <span class="stat-txt">{{ workout.duration_minutes }} min</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-icon">🔥</span>
+                        <span class="stat-txt">{{ workout.calories_burned|round(0)|int }} cal</span>
+                    </div>
+                </div>
+
+                {% if workout.heart_rate_avg or workout.distance_km %}
+                <div class="stat-row border-top">
+                    {% if workout.heart_rate_avg %}
+                    <div class="stat-item">
+                        <span class="stat-icon">❤️</span>
+                        <span class="stat-txt">{{ workout.heart_rate_avg }} BPM</span>
+                    </div>
+                    {% endif %}
+                    {% if workout.distance_km %}
+                    <div class="stat-item">
+                        <span class="stat-icon">📍</span>
+                        <span class="stat-txt">{{ workout.distance_km|round(2) }} km</span>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                {% if workout.notes %}
+                <p class="card-notes">{{ workout.notes }}</p>
+                {% endif %}
+            </div>
+
+            <div class="card-footer">
+                <small class="text-muted">{{ workout.logged_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                <div class="card-actions">
+                    <a href="{{ url_for('activity.edit_activity', workout_id=workout.id) }}"
+                        class="btn btn-sm btn-secondary">Edit</a>
+                    <form method="POST" action="{{ url_for('activity.delete_activity', workout_id=workout.id) }}"
+                        class="inline-form">
+                        <button type="submit" class="btn btn-sm btn-danger"
+                            onclick="return confirm('Delete this workout?');">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+        {% if workouts.has_prev %}
+        <a href="{{ url_for('activity.index', page=workouts.prev_num) }}" class="btn btn-secondary">« Previous</a>
+        {% endif %}
+
+        {% for page_num in workouts.iter_pages() %}
+        {% if page_num %}
+        {% if page_num == workouts.page %}
+        <span class="btn btn-primary active disabled">{{ page_num }}</span>
+        {% else %}
+        <a href="{{ url_for('activity.index', page=page_num) }}" class="btn btn-secondary">{{ page_num }}</a>
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+
+        {% if workouts.has_next %}
+        <a href="{{ url_for('activity.index', page=workouts.next_num) }}" class="btn btn-secondary">Next »</a>
+        {% endif %}
+    </div>
+    {% else %}
+    <div class="empty-state card">
+        <div class="empty-icon">💪</div>
+        <h3>No workouts logged yet</h3>
+        <p>Start tracking your fitness journey today!</p>
+        <a href="{{ url_for('activity.log_activity') }}" class="btn btn-primary">Log your first workout</a>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .card-header h3 {
+        margin: 0;
+        font-size: 1.1rem;
+    }
+
+    .badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 99px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .badge-light {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .badge-moderate {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .badge-vigorous {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .stat-row {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .border-top {
+        border-top: 1px solid var(--border-color);
+        padding-top: 0.75rem;
+    }
+
+    .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+    }
+
+    .stat-txt {
+        font-weight: 500;
+        color: var(--text-main);
+    }
+
+    .card-notes {
+        background: var(--bg);
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        font-style: italic;
+        margin: 0.5rem 0 0 0;
+    }
+
+    .card-footer {
+        margin-top: 1.25rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .inline-form {
+        display: inline;
+    }
+
+    .card-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 2rem;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+
+    .empty-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    /* Bluetooth Widget */
+    .header-actions {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .ble-card {
+        margin-bottom: 2rem;
+        border: 2px solid var(--primary-color);
+        background: linear-gradient(135deg, rgba(79, 70, 229, 0.05) 0%, rgba(79, 70, 229, 0.1) 100%);
+    }
+
+    .ble-card.hidden {
+        display: none;
+    }
+
+    .ble-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .ble-status {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        background: var(--success-color);
+        border-radius: 50%;
+        box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
+        }
+
+        70% {
+            box-shadow: 0 0 0 6px rgba(34, 197, 94, 0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+        }
+    }
+
+    .heart-rate-display {
+        display: flex;
+        align-items: baseline;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .hr-value {
+        font-size: 3rem;
+        font-weight: 800;
+        color: var(--text-main);
+        font-variant-numeric: tabular-nums;
+    }
+
+    .hr-unit {
+        font-size: 1rem;
+        color: var(--text-muted);
+        font-weight: 600;
+    }
+
+    .hr-icon {
+        font-size: 1.5rem;
+        animation: heartbeat 1s ease-in-out infinite;
+    }
+
+    @keyframes heartbeat {
+        0% {
+            transform: scale(1);
+        }
+
+        15% {
+            transform: scale(1.3);
+        }
+
+        30% {
+            transform: scale(1);
+        }
+
+        45% {
+            transform: scale(1.15);
+        }
+
+        60% {
+            transform: scale(1);
+        }
+    }
+
+    .ble-tip {
+        text-align: center;
+        margin: 0.5rem 0 0 0;
+        font-size: 0.875rem;
+        color: var(--text-muted);
+    }
+
+    @media (max-width: 600px) {
+        .card-footer {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .card-actions {
+            width: 100%;
+            justify-content: flex-end;
+        }
+
+        .header-actions {
+            flex-direction: column;
+        }
+
+        .header-actions .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+
+
+<script src="{{ url_for('static', filename='js/bluetooth.js') }}"></script>
+<script>
+    // Debug Logger
+    // Debug Logger (Console only)
+    function log(msg, type = 'info') {
+        console[type === 'error' ? 'error' : (type === 'warn' ? 'warn' : 'log')](msg);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        log('Page loaded. Checking globals...');
+
+        if (typeof FitnessDeviceConnector === 'undefined') {
+            log('CRITICAL: FitnessDeviceConnector is not defined. bluetooth.js failed to load?', 'error');
+            return;
+        }
+
+        const bleButton = document.getElementById('btn-connect-ble');
+        const disconnectButton = document.getElementById('btn-disconnect-ble');
+        const bleWidget = document.getElementById('ble-widget');
+        const deviceNameEl = document.getElementById('ble-device-name');
+        const hrValueEl = document.getElementById('hr-value');
+
+        let connector = new FitnessDeviceConnector();
+
+        // 1. Check for Secure Context
+        if (!window.isSecureContext) {
+            const errorMsg = '⚠️ Secure Context Required (HTTPS/localhost)';
+            log(errorMsg, 'error');
+
+            bleButton.style.display = 'none';
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-warning';
+            alert.innerHTML = `<strong>Error:</strong> ${errorMsg}`;
+            document.querySelector('.header-actions').prepend(alert);
+            return;
+        }
+
+        // 2. Check for Browser Support
+        if (!connector.isBluetoothSupported()) {
+            const errorMsg = '⚠️ Web Bluetooth API not supported in this browser';
+            log(errorMsg, 'error');
+
+            bleButton.style.display = 'none';
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-warning';
+            alert.innerHTML = `<strong>Error:</strong> ${errorMsg}`;
+            document.querySelector('.header-actions').prepend(alert);
+            return;
+        }
+
+        log('Bluetooth supported and secure context confirmed. Waiting for user action.');
+
+        bleButton.addEventListener('click', async () => {
+            log('Connect button clicked. Requesting device...');
+            try {
+                bleButton.disabled = true;
+                bleButton.innerHTML = '<span>⏳</span> Connecting...';
+
+                log('Calling connector.connect()...');
+                await connector.connect();
+                log('Connection successful!');
+
+                // On success
+                bleWidget.classList.remove('hidden');
+                bleButton.classList.add('hidden');
+            } catch (error) {
+                log(`Connection failed: ${error.message}`, 'error');
+
+                if (error.name !== 'NotFoundError') {
+                    alert('Connection failed: ' + error.message);
+                }
+                resetButtons();
+            }
+        });
+
+        disconnectButton.addEventListener('click', async () => {
+            log('Disconnecting...');
+            await connector.disconnect();
+            log('Disconnected.');
+            resetButtons();
+            bleWidget.classList.add('hidden');
+            bleButton.classList.remove('hidden');
+        });
+
+        function resetButtons() {
+            bleButton.disabled = false;
+            bleButton.innerHTML = '<span>🔌</span> Connect Device';
+        }
+
+        // Set up listeners
+        connector.on('onConnect', (name) => {
+            log(`Device connected: ${name}`);
+            deviceNameEl.textContent = name || 'Connected Device';
+        });
+
+        connector.on('onHeartRateUpdate', (bpm) => {
+            log(`Heart Rate Update: ${bpm} bpm`);
+            hrValueEl.textContent = bpm;
+            const duration = 60 / (bpm || 60);
+            const icon = document.querySelector('.hr-icon');
+            if (icon) icon.style.animationDuration = `${duration}s`;
+        });
+
+        connector.on('onDisconnect', () => {
+            log('Device disconnected event received');
+            resetButtons();
+            bleWidget.classList.add('hidden');
+            bleButton.classList.remove('hidden');
+        });
+
+        connector.on('onError', (err) => {
+            log(`Connector Error: ${err}`, 'error');
+        });
+    });
+</script>
+{% endblock %}

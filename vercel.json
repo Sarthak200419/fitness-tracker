@@ -1,0 +1,16 @@
+[build]
+pythonVersion = "3.11"
+
+[env]
+FLASK_ENV = "production"
+PYTHON_VERSION = "3.11"
+
+[[redirects]]
+source = "/auth/*"
+destination = "/auth/:splat"
+status = 200
+
+[[redirects]]
+source = "/*"
+destination = "/index.html"
+status = 200

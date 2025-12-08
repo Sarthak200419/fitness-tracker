@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Log Workout - Fitness Tracker{% endblock %}
+
+{% block content %}
+<div class="log-activity">
+    <h1>Log a New Workout</h1>
+    
+    <form method="POST" class="form workout-form">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="exercise_type">Exercise Type *</label>
+                <select id="exercise_type" name="exercise_type" required class="form-control">
+                    <option value="">Select Type...</option>
+                    <option value="cardio">Cardio</option>
+                    <option value="strength">Strength Training</option>
+                    <option value="flexibility">Flexibility/Yoga</option>
+                    <option value="sports">Sports</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="activity_name">Activity Name *</label>
+                <select id="activity_name" name="activity_name" required class="form-control">
+                    <option value="">Select Activity...</option>
+                    {% for activity in activities %}
+                        <option value="{{ activity }}">{{ activity|replace('_', ' ')|title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label for="duration_minutes">Duration (minutes) *</label>
+                <input type="number" id="duration_minutes" name="duration_minutes" min="1" required class="form-control">
+            </div>
+            
+            <div class="form-group">
+                <label for="intensity">Intensity</label>
+                <select id="intensity" name="intensity" class="form-control">
+                    <option value="light">Light</option>
+                    <option value="moderate" selected>Moderate</option>
+                    <option value="vigorous">Vigorous</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label for="distance_km">Distance (km) - Optional</label>
+                <input type="number" id="distance_km" name="distance_km" step="0.1" min="0" class="form-control">
+            </div>
+            
+            <div class="form-group">
+                <label for="heart_rate_avg">Avg Heart Rate (BPM) - Optional</label>
+                <input type="number" id="heart_rate_avg" name="heart_rate_avg" min="0" max="220" class="form-control">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="notes">Notes</label>
+            <textarea id="notes" name="notes" placeholder="How did the workout go?" class="form-control"></textarea>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Log Workout</button>
+            <a href="{{ url_for('activity.index') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<style>
+.log-activity {
+    max-width: 600px;
+    margin: 2rem auto;
+}
+
+.log-activity h1 {
+    margin-bottom: 2rem;
+    color: #333;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.form-row.full {
+    grid-template-columns: 1fr;
+}
+
+.form-group {
+    display: grid;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: #555;
+}
+
+.form-control {
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.form-actions .btn {
+    flex: 1;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}

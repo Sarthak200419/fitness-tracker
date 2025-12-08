@@ -1,0 +1,256 @@
+{% extends "base.html" %}
+
+{% block title %}Nutrition Tracker - Fitness Tracker{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="section-header">
+        <h1>Nutrition Tracker</h1>
+        <a href="{{ url_for('nutrition.log_food') }}" class="btn btn-primary">
+            <span>+</span> Log Meal
+        </a>
+    </div>
+
+    <!-- Daily Summary -->
+    <div class="summary-grid">
+        <div class="card summary-box main-summary">
+            <h3>Calories</h3>
+            <div class="summary-val">{{ totals.calories|round(0)|int }}</div>
+            <div class="summary-sub">Goal: {{ daily_target }}</div>
+            <div class="mini-progress">
+                <div class="mini-fill" style="width: {{ (totals.calories / daily_target * 100)|round(0)|int }}%"></div>
+            </div>
+        </div>
+
+        <div class="card summary-box">
+            <h3>Protein</h3>
+            <div class="summary-val">{{ totals.protein|round(0)|int }}g</div>
+            <div class="summary-sub">Macro</div>
+        </div>
+
+        <div class="card summary-box">
+            <h3>Fat</h3>
+            <div class="summary-val">{{ totals.fat|round(0)|int }}g</div>
+            <div class="summary-sub">Macro</div>
+        </div>
+
+        <div class="card summary-box">
+            <h3>Carbs</h3>
+            <div class="summary-val">{{ totals.carbs|round(0)|int }}g</div>
+            <div class="summary-sub">Macro</div>
+        </div>
+    </div>
+
+    <!-- Food Entries -->
+    <div class="section-container">
+        <h2>Today's Entries</h2>
+
+        {% if today_entries %}
+        <div class="entries-list">
+            {% for entry in today_entries %}
+            <div class="card entry-card">
+                <div class="entry-left">
+                    <span class="meal-tag">{{ entry.meal_type|title }}</span>
+                    <div class="entry-main">
+                        <h4>{{ entry.food.name }}</h4>
+                        <span class="entry-amount">{{ entry.quantity_grams|round(0)|int }}g • {{
+                            entry.calories|round(0)|int }} cal</span>
+                    </div>
+                </div>
+
+                <div class="entry-macros">
+                    <span class="macro-pill">P: {{ entry.protein_g|round(1) or 0 }}</span>
+                    <span class="macro-pill">F: {{ entry.fat_g|round(1) or 0 }}</span>
+                    <span class="macro-pill">C: {{ entry.carbs_g|round(1) or 0 }}</span>
+                </div>
+
+                <div class="entry-actions">
+                    <form method="POST" action="{{ url_for('nutrition.delete_entry', entry_id=entry.id) }}">
+                        <button type="submit" class="icon-btn delete-btn" title="Delete"
+                            onclick="return confirm('Delete this entry?');">&times;</button>
+                    </form>
+                    <small class="entry-time">{{ entry.logged_at.strftime('%H:%M') }}</small>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state card">
+            <div class="empty-icon">🍽️</div>
+            <h3>No meals logged today</h3>
+            <p>Track your nutrition to stay on top of your goals!</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+
+    .summary-box {
+        text-align: center;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .summary-box h3 {
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: 0.5rem;
+    }
+
+    .summary-val {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--text-main);
+        line-height: 1;
+        margin-bottom: 0.25rem;
+    }
+
+    .main-summary .summary-val {
+        color: var(--primary-color);
+    }
+
+    .summary-sub {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+    }
+
+    .mini-progress {
+        width: 100%;
+        height: 4px;
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 99px;
+        margin-top: 0.75rem;
+        overflow: hidden;
+    }
+
+    .mini-fill {
+        height: 100%;
+        background: var(--primary-color);
+    }
+
+    .entries-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .entry-card {
+        display: grid;
+        grid-template-columns: 2fr 1.5fr auto;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.25rem;
+    }
+
+    .entry-left {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .meal-tag {
+        background: #e0e7ff;
+        color: var(--primary-color);
+        padding: 0.25rem 0.75rem;
+        border-radius: 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .entry-main h4 {
+        margin: 0;
+        font-size: 1rem;
+    }
+
+    .entry-amount {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+    }
+
+    .entry-macros {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .macro-pill {
+        background: var(--bg);
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+
+    .entry-actions {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0.25rem;
+    }
+
+    .entry-time {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+    }
+
+    .icon-btn.delete-btn {
+        background: none;
+        border: none;
+        color: var(--danger-color);
+        font-size: 1.5rem;
+        cursor: pointer;
+        line-height: 1;
+        padding: 0;
+        opacity: 0.6;
+        transition: opacity 0.2s;
+    }
+
+    .icon-btn.delete-btn:hover {
+        opacity: 1;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+    }
+
+    .empty-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+    @media (max-width: 768px) {
+        .entry-card {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            text-align: center;
+        }
+
+        .entry-left {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .entry-macros {
+            justify-content: center;
+        }
+
+        .entry-actions {
+            align-items: center;
+        }
+    }
+</style>
+{% endblock %}

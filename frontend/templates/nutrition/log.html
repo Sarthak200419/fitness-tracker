@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}Log Food - Fitness Tracker{% endblock %}
+
+{% block content %}
+<div class="log-food">
+    <h1>Log a Meal</h1>
+    
+    <form method="POST" class="form food-form">
+        <div class="form-group">
+            <label for="food_id">Food Item *</label>
+            <select id="food_id" name="food_id" required class="form-control">
+                <option value="">Select a food...</option>
+                {% for food in foods %}
+                    <option value="{{ food.id }}">{{ food.name }} ({{ food.calories_per_100g }} cal/100g)</option>
+                {% endfor %}
+            </select>
+            <small>Can't find your food? <a href="#add-custom-food" onclick="toggleCustomFood()">Add a custom food</a></small>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label for="quantity_grams">Quantity (grams) *</label>
+                <input type="number" id="quantity_grams" name="quantity_grams" min="1" step="1" required class="form-control">
+            </div>
+            
+            <div class="form-group">
+                <label for="meal_type">Meal Type</label>
+                <select id="meal_type" name="meal_type" class="form-control">
+                    <option value="breakfast">Breakfast</option>
+                    <option value="lunch">Lunch</option>
+                    <option value="dinner">Dinner</option>
+                    <option value="snack" selected>Snack</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Log Food</button>
+            <a href="{{ url_for('nutrition.index') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+    
+    <!-- Add Custom Food Section -->
+    <div id="add-custom-food" class="custom-food-section" style="display: none;">
+        <h2>Add Custom Food</h2>
+        <form method="POST" action="{{ url_for('nutrition.add_custom_food') }}" class="form">
+            <div class="form-group">
+                <label for="name">Food Name *</label>
+                <input type="text" id="name" name="name" required class="form-control">
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="calories_per_100g">Calories per 100g *</label>
+                    <input type="number" id="calories_per_100g" name="calories_per_100g" min="0" step="0.1" required class="form-control">
+                </div>
+                
+                <div class="form-group">
+                    <label for="protein_g">Protein (g per 100g)</label>
+                    <input type="number" id="protein_g" name="protein_g" min="0" step="0.1" class="form-control">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="fat_g">Fat (g per 100g)</label>
+                    <input type="number" id="fat_g" name="fat_g" min="0" step="0.1" class="form-control">
+                </div>
+                
+                <div class="form-group">
+                    <label for="carbs_g">Carbs (g per 100g)</label>
+                    <input type="number" id="carbs_g" name="carbs_g" min="0" step="0.1" class="form-control">
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-success">Add to Database</button>
+                <button type="button" class="btn btn-secondary" onclick="toggleCustomFood()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function toggleCustomFood() {
+    const section = document.getElementById('add-custom-food');
+    if (section.style.display === 'none') {
+        section.style.display = 'block';
+    } else {
+        section.style.display = 'none';
+    }
+}
+</script>
+
+<style>
+.log-food {
+    max-width: 600px;
+    margin: 2rem auto;
+}
+
+.log-food h1 {
+    margin-bottom: 2rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #555;
+}
+
+.form-control, select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.form-actions .btn {
+    flex: 1;
+    text-align: center;
+}
+
+.custom-food-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 2px solid #eee;
+}
+
+.custom-food-section h2 {
+    margin-top: 0;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}

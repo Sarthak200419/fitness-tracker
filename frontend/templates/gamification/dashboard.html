@@ -1,0 +1,298 @@
+{% extends "base.html" %}
+
+{% block title %}Gamification Dashboard - Fitness Tracker{% endblock %}
+
+{% block content %}
+<div class="gamification-dashboard">
+    <h1>Your Progress 🎮</h1>
+    
+    <!-- Level & XP Section -->
+    <div class="level-section">
+        <div class="level-card">
+            <div class="level-icon">⭐</div>
+            <div class="level-info">
+                <h2>Level {{ gamification.current_level }}</h2>
+                <p class="level-title">Fitness Champion</p>
+            </div>
+            <div class="total-xp">
+                <span class="xp-label">Total XP</span>
+                <span class="xp-value">{{ gamification.total_xp }}</span>
+            </div>
+        </div>
+        
+        <div class="xp-progress-card">
+            <h3>Progress to Level {{ gamification.current_level + 1 }}</h3>
+            <div class="xp-bar">
+                <div class="xp-fill" style="width: {{ (gamification.xp_in_current_level / gamification.get_xp_for_next_level() * 100)|round(0)|int }}%"></div>
+            </div>
+            <p class="xp-detail">{{ gamification.xp_in_current_level }} / {{ gamification.get_xp_for_next_level() }} XP</p>
+        </div>
+    </div>
+    
+    <!-- Streak Section -->
+    <div class="streak-section">
+        <div class="streak-card">
+            <div class="streak-number">🔥 {{ gamification.current_streak }}</div>
+            <p class="streak-label">Day Streak</p>
+            <small>Keep it up!</small>
+        </div>
+        
+        <div class="streak-card">
+            <div class="streak-number">🏆 {{ gamification.longest_streak }}</div>
+            <p class="streak-label">Best Streak</p>
+            <small>Your record</small>
+        </div>
+    </div>
+    
+    <!-- Badges Section -->
+    <div class="badges-section">
+        <h2>Your Badges</h2>
+        
+        {% if user_badges %}
+            <div class="badges-grid">
+                {% for user_badge in user_badges %}
+                    <div class="badge-item earned">
+                        <div class="badge-icon">🏅</div>
+                        <h4>{{ user_badge.badge.name }}</h4>
+                        <small>{{ user_badge.badge.description }}</small>
+                        <p class="earned-date">Earned: {{ user_badge.earned_at.strftime('%Y-%m-%d') }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="no-badges">No badges earned yet. Keep grinding!</p>
+        {% endif %}
+        
+        <!-- Upcoming Badges -->
+        {% if not earned_badge_ids == all_badges|map(attribute='id')|list %}
+            <h3 style="margin-top: 2rem;">Locked Badges</h3>
+            <div class="badges-grid">
+                {% for badge in all_badges %}
+                    {% if badge.id not in earned_badge_ids %}
+                        <div class="badge-item locked">
+                            <div class="badge-icon">🔒</div>
+                            <h4>{{ badge.name }}</h4>
+                            <small>{{ badge.description }}</small>
+                            <p class="unlock-condition">
+                                Unlock: {{ badge.condition_value }} 
+                                {% if badge.condition_type == 'streak' %}day streak{% elif badge.condition_type == 'total_xp' %}XP{% else %}{{ badge.condition_type }}{% endif %}
+                            </p>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.gamification-dashboard {
+    padding: 2rem 0;
+}
+
+.gamification-dashboard h1 {
+    margin-bottom: 2rem;
+    color: #333;
+}
+
+.level-section {
+    margin-bottom: 2rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.level-card, .xp-progress-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.level-card {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.level-icon {
+    font-size: 3rem;
+}
+
+.level-info {
+    flex: 1;
+}
+
+.level-info h2 {
+    margin: 0;
+    font-size: 2rem;
+}
+
+.level-title {
+    margin: 0;
+    opacity: 0.9;
+}
+
+.total-xp {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(255,255,255,0.2);
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.xp-label {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    opacity: 0.9;
+}
+
+.xp-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.xp-progress-card h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+.xp-bar {
+    background: rgba(255,255,255,0.3);
+    height: 12px;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.xp-fill {
+    background: rgba(255,255,255,0.9);
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+.xp-detail {
+    margin: 0;
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.streak-section {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.streak-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.streak-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #ff6b6b;
+    margin-bottom: 0.5rem;
+}
+
+.streak-label {
+    margin: 0;
+    font-size: 1rem;
+    color: #333;
+}
+
+.streak-card small {
+    color: #999;
+}
+
+.badges-section {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.badges-section h2, .badges-section h3 {
+    margin-top: 0;
+    color: #333;
+}
+
+.badges-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+}
+
+.badge-item {
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.badge-item.earned {
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+    border: 2px solid #ff9800;
+}
+
+.badge-item.locked {
+    background: #f5f5f5;
+    color: #999;
+    border: 2px dashed #ddd;
+}
+
+.badge-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.badge-item h4 {
+    margin: 0.5rem 0;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.badge-item.locked h4 {
+    color: #999;
+}
+
+.badge-item small {
+    display: block;
+    font-size: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.earned-date, .unlock-condition {
+    margin: 0;
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+
+.no-badges {
+    text-align: center;
+    color: #999;
+    padding: 1rem;
+}
+
+@media (max-width: 768px) {
+    .level-section {
+        grid-template-columns: 1fr;
+    }
+    
+    .streak-section {
+        grid-template-columns: 1fr;
+    }
+    
+    .level-card {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+</style>
+{% endblock %}

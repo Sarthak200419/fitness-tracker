@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+
+{% block title %}My Goals - Fitness Tracker{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="section-header">
+        <h1>Fitness Goals</h1>
+        <a href="{{ url_for('goals.create_goal') }}" class="btn btn-primary">
+            <span>+</span> Create New Goal
+        </a>
+    </div>
+
+    {% if not active_goals and not completed_goals %}
+    <div class="empty-state card">
+        <div class="empty-icon">🎯</div>
+        <h3>Set your first goal</h3>
+        <p>Goals help you stay focused and track your progress.</p>
+        <a href="{{ url_for('goals.create_goal') }}" class="btn btn-primary mt-4">Get Started</a>
+    </div>
+    {% endif %}
+
+    <!-- Active Goals -->
+    {% if active_goals %}
+    <h2 class="sub-header">In Progress</h2>
+    <div class="goals-grid">
+        {% for goal in active_goals %}
+        <div class="card goal-card">
+            <div class="goal-top">
+                <div class="goal-title">
+                    <h3>{{ goal.goal_type|replace('_', ' ')|title }}</h3>
+                    {% if goal.target_date %}
+                    <small class="goal-date">Target: {{ goal.target_date.strftime('%b %d, %Y') }}</small>
+                    {% endif %}
+                </div>
+                <div class="goal-percentage">{{ goal.progress_percentage()|round(0)|int }}%</div>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-track">
+                    <div class="progress-bar-fill" style="width: {{ [goal.progress_percentage(), 100]|min }}%"></div>
+                </div>
+            </div>
+
+            <div class="goal-stats-row">
+                <div class="g-stat">
+                    <span class="lbl">Current</span>
+                    <span class="val">{{ goal.current_value or 0 }}</span>
+                </div>
+                <div class="g-stat separator">
+                    <span class="lbl">Target</span>
+                    <span class="val">{{ goal.target_value }}</span>
+                </div>
+                <div class="g-stat">
+                    <span class="lbl">Unit</span>
+                    <span class="val">{{ goal.unit }}</span>
+                </div>
+            </div>
+
+            <div class="card-footer-simple">
+                <a href="{{ url_for('goals.edit_goal', goal_id=goal.id) }}" class="link-btn">Edit</a>
+                <form method="POST" action="{{ url_for('goals.delete_goal', goal_id=goal.id) }}" class="inline">
+                    <button type="submit" class="link-btn text-danger"
+                        onclick="return confirm('Delete this goal?');">Delete</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Completed Goals -->
+    {% if completed_goals %}
+    <h2 class="sub-header success-header">Completed 🎉</h2>
+    <div class="goals-grid">
+        {% for goal in completed_goals %}
+        <div class="card goal-card completed-card">
+            <div class="completed-icon">✓</div>
+            <div class="goal-content">
+                <h3>{{ goal.goal_type|replace('_', ' ')|title }}</h3>
+                <p>Reached {{ goal.target_value }} {{ goal.unit }}</p>
+            </div>
+            <div class="goal-actions">
+                <form method="POST" action="{{ url_for('goals.delete_goal', goal_id=goal.id) }}">
+                    <button type="submit" class="icon-btn text-muted" title="Archive/Delete">&times;</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .sub-header {
+        margin: 2rem 0 1rem 0;
+        font-size: 1.25rem;
+        color: var(--text-muted);
+        font-weight: 600;
+    }
+
+    .success-header {
+        color: var(--success-color);
+    }
+
+    .goals-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .goal-card {
+        display: flex;
+        flex-direction: column;
+        padding: 1.5rem;
+    }
+
+    .goal-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+
+    .goal-title h3 {
+        margin: 0;
+        font-size: 1.1rem;
+        line-height: 1.3;
+    }
+
+    .goal-date {
+        display: block;
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+    }
+
+    .goal-percentage {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--primary-color);
+    }
+
+    .progress-container {
+        margin-bottom: 1.5rem;
+    }
+
+    .progress-track {
+        height: 8px;
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 99px;
+        overflow: hidden;
+    }
+
+    .progress-bar-fill {
+        height: 100%;
+        background: var(--success-color);
+        border-radius: 99px;
+        transition: width 0.5s ease;
+    }
+
+    .goal-stats-row {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 0.5rem;
+        text-align: center;
+        background: var(--bg);
+        padding: 1rem;
+        border-radius: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
+    .g-stat {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .g-stat.separator {
+        border-left: 1px solid rgba(0, 0, 0, 0.05);
+        border-right: 1px solid rgba(0, 0, 0, 0.05);
+        padding: 0 1rem;
+    }
+
+    .g-stat .lbl {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: 0.25rem;
+    }
+
+    .g-stat .val {
+        font-weight: 700;
+        color: var(--text-main);
+    }
+
+    .card-footer-simple {
+        margin-top: auto;
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        font-size: 0.875rem;
+    }
+
+    .link-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--text-muted);
+        font-weight: 500;
+        padding: 0;
+        text-decoration: underline;
+    }
+
+    .link-btn:hover {
+        color: var(--primary-color);
+    }
+
+    .link-btn.text-danger:hover {
+        color: var(--danger-color);
+    }
+
+    /* Completed Card */
+    .completed-card {
+        flex-direction: row;
+        align-items: center;
+        gap: 1rem;
+        border-left: 4px solid var(--success-color);
+    }
+
+    .completed-icon {
+        width: 40px;
+        height: 40px;
+        background: #dcfce7;
+        color: #166534;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+
+    .goal-content h3 {
+        margin: 0;
+        font-size: 1rem;
+    }
+
+    .goal-content p {
+        margin: 0;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem;
+    }
+
+    .empty-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .mt-4 {
+        margin-top: 1.5rem;
+    }
+</style>
+{% endblock %}
