@@ -58,8 +58,8 @@ def log_food():
         
         # Create food entry
         entry = FoodEntry(
-            user_id=current_user.id,
-            food_id=food_id,
+            user=current_user,
+            food=food,
             quantity_grams=quantity,
             meal_type=meal_type
         )

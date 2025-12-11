@@ -59,9 +59,9 @@
                 </div>
 
                 <div class="entry-macros">
-                    <span class="macro-pill">P: {{ entry.protein_g|round(1) or 0 }}</span>
-                    <span class="macro-pill">F: {{ entry.fat_g|round(1) or 0 }}</span>
-                    <span class="macro-pill">C: {{ entry.carbs_g|round(1) or 0 }}</span>
+                    <span class="macro-pill">P: {{ (entry.protein_g or 0)|round(1) }}</span>
+                    <span class="macro-pill">F: {{ (entry.fat_g or 0)|round(1) }}</span>
+                    <span class="macro-pill">C: {{ (entry.carbs_g or 0)|round(1) }}</span>
                 </div>
 
                 <div class="entry-actions">
