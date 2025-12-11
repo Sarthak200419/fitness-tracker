@@ -292,7 +292,8 @@ main {
 }
 
 .btn-danger:hover {
-    background: #dc2626; /* Red 600 */
+    background: #dc2626;
+    /* Red 600 */
     box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.3);
 }
 
@@ -445,4 +446,107 @@ main {
     .navbar-actions {
         margin-left: 0;
     }
+}
+
+/* Authentication Pages */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    /* Increased slightly for better vertical centering */
+    padding: 2rem 1rem;
+}
+
+.auth-card {
+    background: var(--surface);
+    padding: 2.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    width: 100%;
+    max-width: 440px;
+    border: 1px solid var(--border-color);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.auth-card h1 {
+    margin-bottom: 2rem;
+    text-align: center;
+    color: var(--text-main);
+    font-size: 2rem;
+}
+
+.auth-card .form-group label {
+    color: var(--text-main);
+}
+
+.auth-card .form-group small {
+    display: block;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    margin-top: 0.35rem;
+}
+
+.password-wrapper {
+    position: relative;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.password-toggle:hover {
+    color: var(--primary-color);
+    background-color: var(--bg);
+}
+
+.form-group.checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.form-group.checkbox input[type="checkbox"] {
+    width: 1.2rem;
+    height: 1.2rem;
+    border-radius: 4px;
+    accent-color: var(--primary-color);
+    border: 2px solid var(--border-color);
+    cursor: pointer;
+}
+
+.btn-block {
+    width: 100%;
+    margin-top: 1rem;
+    padding: 0.875rem;
+}
+
+.auth-link {
+    text-align: center;
+    margin-top: 2rem;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+.auth-link a {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.auth-link a:hover {
+    color: var(--primary-hover);
+    text-decoration: underline;
 }
