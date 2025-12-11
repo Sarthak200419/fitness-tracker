@@ -488,7 +488,6 @@ main {
 .password-toggle {
     position: absolute;
     right: 12px;
-    top: 50%;
     transform: translateY(-50%);
     background: none;
     border: none;
@@ -543,4 +542,12 @@ main {
 .auth-link a:hover {
     color: var(--primary-hover);
     text-decoration: underline;
+}
+
+/* Footer */
+.footer {
+    padding: 2rem;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.9rem;
 }
