@@ -38,7 +38,7 @@ def log_activity():
         
         # Create workout
         workout = Workout(
-            user_id=current_user.id,
+            user=current_user,
             exercise_type=exercise_type,
             activity_name=activity_name,
             duration_minutes=duration,
