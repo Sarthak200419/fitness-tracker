@@ -413,7 +413,10 @@
             const alert = document.createElement('div');
             alert.className = 'alert alert-warning';
             alert.innerHTML = `<strong>Error:</strong> ${errorMsg}`;
-            document.querySelector('.header-actions').prepend(alert);
+
+            // Insert strictly AFTER the section header container
+            const sectionHeader = document.querySelector('.section-header');
+            sectionHeader.insertAdjacentElement('afterend', alert);
             return;
         }
 

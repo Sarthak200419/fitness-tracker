@@ -286,6 +286,16 @@ main {
     background: #334155;
 }
 
+.btn-danger {
+    background: var(--danger-color);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #dc2626; /* Red 600 */
+    box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.3);
+}
+
 .btn-sm {
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
