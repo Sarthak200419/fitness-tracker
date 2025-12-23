@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Create Goal - Fitness Tracker{% endblock %}
+{% block title %}Create Goal - FitPlus{% endblock %}
 
 {% block content %}
 <div class="create-goal">
     <h1>Create a New Goal</h1>
-    
+
     <form method="POST" class="form goal-form">
         <div class="form-group">
             <label for="goal_type">Goal Type *</label>
@@ -19,17 +19,17 @@
                 <option value="steps">Daily Steps</option>
             </select>
         </div>
-        
+
         <div class="form-group">
             <label for="target_value">Target Value *</label>
             <input type="number" id="target_value" name="target_value" step="0.1" required class="form-control">
         </div>
-        
+
         <div class="form-group">
             <label for="unit">Unit (kg, cal, min, etc.) *</label>
             <input type="text" id="unit" name="unit" required class="form-control">
         </div>
-        
+
         <div class="form-group">
             <label for="goal_period">Goal Period *</label>
             <select id="goal_period" name="goal_period" required class="form-control">
@@ -39,12 +39,12 @@
                 <option value="overall">Overall</option>
             </select>
         </div>
-        
+
         <div class="form-group">
             <label for="target_date">Target Date (Optional)</label>
             <input type="date" id="target_date" name="target_date" class="form-control">
         </div>
-        
+
         <div class="form-actions">
             <button type="submit" class="btn btn-primary">Create Goal</button>
             <a href="{{ url_for('goals.index') }}" class="btn btn-secondary">Cancel</a>
@@ -53,44 +53,45 @@
 </div>
 
 <style>
-.create-goal {
-    max-width: 500px;
-    margin: 2rem auto;
-}
+    .create-goal {
+        max-width: 500px;
+        margin: 2rem auto;
+    }
 
-.create-goal h1 {
-    margin-bottom: 2rem;
-    color: #333;
-}
+    .create-goal h1 {
+        margin-bottom: 2rem;
+        color: #333;
+    }
 
-.form-group {
-    margin-bottom: 1.5rem;
-}
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
 
-.form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-    color: #555;
-}
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #555;
+    }
 
-.form-control, select {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1rem;
-}
+    .form-control,
+    select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1rem;
+    }
 
-.form-actions {
-    display: flex;
-    gap: 1rem;
-    margin-top: 2rem;
-}
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
 
-.form-actions .btn {
-    flex: 1;
-    text-align: center;
-}
+    .form-actions .btn {
+        flex: 1;
+        text-align: center;
+    }
 </style>
 {% endblock %}

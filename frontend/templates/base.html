@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
     <meta name="theme-color" content="#6366F1">
-    <title>{% block title %}Fitness Tracker{% endblock %}</title>
+    <title>{% block title %}FitPlus{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     {% block extra_css %}{% endblock %}
     <style>
@@ -59,7 +59,7 @@
             <div class="navbar-brand">
                 <a href="{% if current_user.is_authenticated %}{{ url_for('dashboard.index') }}{% else %}{{ url_for('auth.login') }}{% endif %}"
                     class="navbar-logo">
-                    💪 Fitness Tracker
+                    💪 FitPlus
                 </a>
             </div>
             {% if current_user.is_authenticated %}
@@ -112,7 +112,7 @@
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2025 Fitness Tracker. Stay motivated, stay fit!</p>
+            <p>&copy; 2025 FitPlus. Stay motivated, stay fit!</p>
         </div>
     </footer>
 
