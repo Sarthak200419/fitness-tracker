@@ -40,7 +40,7 @@ class FitnessDeviceConnector {
                     { namePrefix: 'Fitbit' },
                     { namePrefix: 'Apple' },
                     { namePrefix: 'Garmin' },
-                    { name: 'Sw 81' }
+                    { name: 'Sw 81 Call' }
                 ],
                 optionalServices: ['heart_rate']
             });
