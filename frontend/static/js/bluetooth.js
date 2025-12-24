@@ -39,7 +39,8 @@ class FitnessDeviceConnector {
                     { services: ['heart_rate'] },
                     { namePrefix: 'Fitbit' },
                     { namePrefix: 'Apple' },
-                    { namePrefix: 'Garmin' }
+                    { namePrefix: 'Garmin' },
+                    { name: 'Sw 81' }
                 ],
                 optionalServices: ['heart_rate']
             });
@@ -52,7 +53,7 @@ class FitnessDeviceConnector {
 
             // Start listening for notifications
             await this.characteristic.startNotifications();
-            this.characteristic.addEventListener('characteristicvaluechanged', 
+            this.characteristic.addEventListener('characteristicvaluechanged',
                 e => this.handleHeartRateUpdate(e));
 
             this.isConnected = true;
@@ -89,7 +90,7 @@ class FitnessDeviceConnector {
     handleHeartRateUpdate(event) {
         const value = event.target.value;
         const heartRate = this.parseHeartRate(value);
-        
+
         this.heartRateData.push({
             bpm: heartRate,
             timestamp: new Date()
@@ -106,7 +107,7 @@ class FitnessDeviceConnector {
     parseHeartRate(value) {
         const flags = value.getUint8(0);
         const rate16Bits = flags & 0x1;
-        
+
         if (rate16Bits) {
             return value.getUint16(1, true);
         } else {
@@ -119,7 +120,7 @@ class FitnessDeviceConnector {
      */
     getAverageHeartRate() {
         if (this.heartRateData.length === 0) return 0;
-        
+
         const sum = this.heartRateData.reduce((acc, data) => acc + data.bpm, 0);
         return Math.round(sum / this.heartRateData.length);
     }
@@ -129,7 +130,7 @@ class FitnessDeviceConnector {
      */
     getMaxHeartRate() {
         if (this.heartRateData.length === 0) return 0;
-        
+
         return Math.max(...this.heartRateData.map(data => data.bpm));
     }
 
@@ -188,10 +189,10 @@ class FitnessDeviceConnector {
      */
     getSessionDuration() {
         if (this.heartRateData.length === 0) return 0;
-        
+
         const firstTime = this.heartRateData[0].timestamp;
         const lastTime = this.heartRateData[this.heartRateData.length - 1].timestamp;
-        
+
         return Math.round((lastTime - firstTime) / 60000); // Convert to minutes
     }
 }
